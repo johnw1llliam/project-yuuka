@@ -1,0 +1,727 @@
+{
+  "name": "Yuuka (Chat)",
+  "nodes": [
+    {
+      "parameters": {
+        "path": ":message/:uuid",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -96,
+        96
+      ],
+      "id": "965dfd4f-fdd2-455e-b7ed-7ef7ab1462bb",
+      "name": "Webhook",
+      "webhookId": "e0f7259b-95e7-4c3b-ae6c-239d7dd640d7"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        112,
+        304
+      ],
+      "id": "f0eb4182-713f-48de-b0a4-4c0eaa7256be",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "QfyeWUBvDKoIQulu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"category\": \"chat\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        256,
+        304
+      ],
+      "id": "1ef4427b-f22c-4df2-8f9d-f2f0bc772fb4",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        784,
+        -112
+      ],
+      "id": "73b71d15-b18e-4108-a157-ab40af809323",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "QfyeWUBvDKoIQulu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook').item.json.params.uuid }}",
+        "databaseName": "yuuka_chat_db"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
+      "typeVersion": 1,
+      "position": [
+        880,
+        -96
+      ],
+      "id": "f89c3e28-cc9d-4ed0-8ee3-352304fea6eb",
+      "name": "MongoDB Chat Memory",
+      "credentials": {
+        "mongoDb": {
+          "id": "TLRwbBITvy8lnyIQ",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are tasked to return a json of the user's message category. There are 3 category:\n1. chat (if user tone is casual chat)\n2. finance (if user question is related to finance)\n3. google (if user specifically asked to google something)\n\nExample: If user asked about his spending, return json category of finance\n\nUser's message: {{ $json.params.message }}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        112,
+        96
+      ],
+      "id": "c84aaa5f-6827-4f59-95aa-200f434dcbb2",
+      "name": "Router"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        784,
+        256
+      ],
+      "id": "783cbc3d-85e3-4ad8-b39a-bb23577283f8",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "QfyeWUBvDKoIQulu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook').item.json.params.uuid }}",
+        "databaseName": "yuuka_chat_db"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
+      "typeVersion": 1,
+      "position": [
+        880,
+        272
+      ],
+      "id": "4e086d09-4c8e-4ae3-8914-3c633b76c064",
+      "name": "MongoDB Chat Memory1",
+      "credentials": {
+        "mongoDb": {
+          "id": "TLRwbBITvy8lnyIQ",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"answer\": {{ JSON.stringify($json.output) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1104,
+        -288
+      ],
+      "id": "146e9e06-27b5-4eee-a970-adccc5dcf61d",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"answer\": {{ JSON.stringify($json.output) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1104,
+        96
+      ],
+      "id": "f89fb8d7-0a60-453b-993e-8a9a9ac7278d",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Yuuka, your boyfriend said:\n{{ $('Webhook').item.json.params.message }}\n\nReply to him directly as if he’s talking to you.",
+        "options": {
+          "systemMessage": "Answer every query while impersonating Yuuka. Yuuka is generally polite, professional, and easy to deal with if treated well. However, most of the people she interacts with in the story are very difficult to deal with, which leads to angry outbursts. This earns her a reputation as cold and ruthless, even though she really isn't. When handling her fellows, she gives off the air of a tired, hard-working mother. She takes pride in her mathematical skills. She will also try to cover up her own mistakes due to her pride. When it comes to her boyfriend, she is endlessly annoyed for having to take responsibility for his spending habits via accounting and telling him to spend less. She won't offer help if she is angry or mad because of these spending habits."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        784,
+        -288
+      ],
+      "id": "00da94fb-64d9-49c3-a2b0-127c968f6260",
+      "name": "Casual Chat"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Yuuka, your boyfriend asked about financial issue:\n{{ $('Webhook').item.json.params.message }}\n\nYou can use MySQL tool to check for his budget if needed.\n\nReply to him directly as if he’s talking to you.",
+        "options": {
+          "systemMessage": "Answer every query while impersonating Yuuka. Yuuka is generally polite, professional, and easy to deal with if treated well. However, most of the people she interacts with in the story are very difficult to deal with, which leads to angry outbursts. This earns her a reputation as cold and ruthless, even though she really isn't. When handling her fellows, she gives off the air of a tired, hard-working mother. She takes pride in her mathematical skills. She will also try to cover up her own mistakes due to her pride. When it comes to her boyfriend, she is endlessly annoyed for having to take responsibility for his spending habits via accounting and telling him to spend less. She won't offer help if she is angry or mad because of these spending habits."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        784,
+        96
+      ],
+      "id": "7f2c18bd-c662-4ff4-a0f6-83b593da41df",
+      "name": "Finance Topic"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.category }}",
+                    "rightValue": "chat",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "a1e37a2d-b70c-4c13-a78d-ae89119bda4c"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "094ee582-126e-4962-ab1c-0e3fe03a9c33",
+                    "leftValue": "={{ $json.output.category }}",
+                    "rightValue": "finance",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "19fbba92-736a-425e-9fd5-439381416389",
+                    "leftValue": "={{ $json.output.category }}",
+                    "rightValue": "google",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        416,
+        80
+      ],
+      "id": "30f542cc-c756-4d41-a832-fa3015e30465",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "table": {
+          "__rl": true,
+          "value": "income_total",
+          "mode": "list",
+          "cachedResultName": "income_total"
+        },
+        "returnAll": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySqlTool",
+      "typeVersion": 2.5,
+      "position": [
+        928,
+        384
+      ],
+      "id": "da99f2f3-64d6-4aa6-9ef0-da0229a10cab",
+      "name": "Select rows from a table in MySQL",
+      "credentials": {
+        "mySql": {
+          "id": "OA8TlRmZI5vEXPv8",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        800,
+        800
+      ],
+      "id": "e99a7956-8e55-45d7-b963-a335665de673",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "QfyeWUBvDKoIQulu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"refined\": \"How to save more money?\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        944,
+        800
+      ],
+      "id": "762ad388-2ca5-4b35-aa8b-6d6b50e6a660",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are tasked to refine the user query to fit the google search. Change the query to sentence that the user want to search. \n\nExample: \nUser: Hey, Can you google me on how to save more money\nAI: How to save more money\n\nAnswer in JSON!\n\nUser's message: {{ $('Webhook').item.json.params.message }}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        800,
+        592
+      ],
+      "id": "4a61f6a8-fd9f-463d-8983-5b32562122aa",
+      "name": "Refinery"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1120,
+        752
+      ],
+      "id": "9f020b74-0898-4c73-a1ce-979533089cb9",
+      "name": "OpenAI Chat Model4",
+      "credentials": {
+        "openAiApi": {
+          "id": "QfyeWUBvDKoIQulu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook').item.json.params.uuid }}",
+        "databaseName": "yuuka_chat_db"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
+      "typeVersion": 1,
+      "position": [
+        1216,
+        816
+      ],
+      "id": "bb5213bd-4177-4317-b53f-276428a6cc8d",
+      "name": "MongoDB Chat Memory2",
+      "credentials": {
+        "mongoDb": {
+          "id": "TLRwbBITvy8lnyIQ",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Yuuka, your boyfriend asked to find information:\n{{ $('Webhook').item.json.params.message }}\n\nYou can use Tavily tool to find related information from google and answer to your boyfriend.",
+        "options": {
+          "systemMessage": "Answer every query while impersonating Yuuka. Yuuka is generally polite, professional, and easy to deal with if treated well. However, most of the people she interacts with in the story are very difficult to deal with, which leads to angry outbursts. This earns her a reputation as cold and ruthless, even though she really isn't. When handling her fellows, she gives off the air of a tired, hard-working mother. She takes pride in her mathematical skills. She will also try to cover up her own mistakes due to her pride. When it comes to her boyfriend, she is endlessly annoyed for having to take responsibility for his spending habits via accounting and telling him to spend less. She won't offer help if she is angry or mad because of these spending habits."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        1120,
+        592
+      ],
+      "id": "5850677f-191c-4d9e-bcca-ad54cd73de6e",
+      "name": "Google Search"
+    },
+    {
+      "parameters": {
+        "query": "={{ $('Refinery').item.json.output.refined }}",
+        "options": {}
+      },
+      "type": "@tavily/n8n-nodes-tavily.tavilyTool",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        928
+      ],
+      "id": "fd838626-67bd-4854-b2c1-6228a95db260",
+      "name": "Search in Tavily",
+      "credentials": {
+        "tavilyApi": {
+          "id": "KmK890axutOaaXot",
+          "name": "Tavily account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"answer\": {{ JSON.stringify($json.output) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1424,
+        592
+      ],
+      "id": "e932ff6b-6bfd-4fe3-b9d2-6cecbc1ca4aa",
+      "name": "Respond to Webhook2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Router",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Router",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Casual Chat",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MongoDB Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Casual Chat",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Router": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Finance Topic",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MongoDB Chat Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "Finance Topic",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Casual Chat": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Finance Topic": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Casual Chat",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Finance Topic",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Refinery",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select rows from a table in MySQL": {
+      "ai_tool": [
+        [
+          {
+            "node": "Finance Topic",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Refinery",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Refinery",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Refinery": {
+      "main": [
+        [
+          {
+            "node": "Google Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Google Search",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MongoDB Chat Memory2": {
+      "ai_memory": [
+        [
+          {
+            "node": "Google Search",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search in Tavily": {
+      "ai_tool": [
+        [
+          {
+            "node": "Google Search",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Search": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d6e79850-8b23-453f-9b91-e75ab6feacb8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "84874fc0213a445260548cee43d8f59791f08dc93c424a3e85fed02513cd55e4"
+  },
+  "id": "Py8tdtZvjVgIlDHS",
+  "tags": []
+}

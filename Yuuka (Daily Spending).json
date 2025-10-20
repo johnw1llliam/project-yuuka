@@ -1,0 +1,311 @@
+{
+  "name": "Yuuka (Daily Spending)",
+  "nodes": [
+    {
+      "parameters": {
+        "path": ":uuid",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -592,
+        416
+      ],
+      "id": "f8f29200-c970-4327-8be9-0429b73ec086",
+      "name": "Webhook",
+      "webhookId": "a52b929e-66b4-493b-8fb2-d4809634dbe4"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"answer\": \"{{ $json.text }}\"\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        992,
+        416
+      ],
+      "id": "30f7a1c9-5c5a-454a-9ab5-507a6f70ff0f",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You found your boyfriend's daily expenses and you need to analyze it.\n\n{{ $('Format Today to Prompt').first().json.today }}\n\nHere are comparison of the total daily spending 3 days ago.\n\n{{ $('Format Total to Prompt').first().json.comparison }}\n\nHis remaining budget:\nRp. {{ $json.total_value }}",
+        "options": {
+          "systemMessage": "Answer every query while impersonating Yuuka. Yuuka is generally polite, professional, and easy to deal with if treated well. However, most of the people she interacts with in the story are very difficult to deal with, which leads to angry outbursts. This earns her a reputation as cold and ruthless, even though she really isn't. When handling her fellows, she gives off the air of a tired, hard-working mother. She takes pride in her mathematical skills. She will also try to cover up her own mistakes due to her pride. When it comes to her boyfriend, she is endlessly annoyed for having to take responsibility for his spending habits via accounting and telling him to spend less. She won't offer help if she is angry or mad because of these spending habits."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        672,
+        416
+      ],
+      "id": "82a3351b-45c3-4a1c-9791-539e5566b04a",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        672,
+        560
+      ],
+      "id": "011c2ca6-747a-42cf-bcec-a95705655c58",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "QfyeWUBvDKoIQulu",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook').first().json.params.uuid }}",
+        "databaseName": "yuuka_chat_db"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
+      "typeVersion": 1,
+      "position": [
+        768,
+        672
+      ],
+      "id": "1c71d52c-04d0-4db6-86ee-fce31df67457",
+      "name": "MongoDB Chat Memory",
+      "credentials": {
+        "mongoDb": {
+          "id": "TLRwbBITvy8lnyIQ",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM daily_total ORDER BY date DESC LIMIT 3;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        -352,
+        416
+      ],
+      "id": "e317b0a0-9114-40b1-b678-dacec7bba088",
+      "name": "Get 3 Latest Total Spending",
+      "credentials": {
+        "mySql": {
+          "id": "OA8TlRmZI5vEXPv8",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Modern n8n syntax (1.x+)\nconst input = $input.all();\n\nconst comparisonText = input\n  .map(item => `${item.json.date} : ${item.json.total_value}`)\n  .join('\\n');\n\nreturn [\n  {\n    json: {\n      comparison: comparisonText\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -144,
+        416
+      ],
+      "id": "056a84df-48d5-420d-b3ab-da966fbd24c5",
+      "name": "Format Total to Prompt"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all input items\nconst spendings = $input.all().map(item => item.json);\n\n// Calculate total\nconst total = spendings.reduce((sum, item) => sum + parseFloat(item.value), 0);\n\n// Turn each spending into a numbered string\nconst prettyList = spendings\n  .map((item, index) => `${index + 1}. ${item.description}, ${parseInt(item.value).toLocaleString(\"id-ID\")}`)\n  .join(\"\\n\");\n\n// Append total as a new line\nconst finalOutput = `${prettyList}\\nTotal: ${total.toLocaleString(\"id-ID\")}`;\n\n// Return as single output\nreturn [\n  {\n    json: {\n      today: finalOutput\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        272,
+        416
+      ],
+      "id": "5107e38a-8a02-4e77-b982-3d67c69d2deb",
+      "name": "Format Today to Prompt"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT *\nFROM daily_spending\nWHERE DATE(created_at) = CURDATE();\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        64,
+        416
+      ],
+      "id": "f0893ab5-689f-44a8-8c73-f44e428bce5e",
+      "name": "Get Today Spending",
+      "credentials": {
+        "mySql": {
+          "id": "OA8TlRmZI5vEXPv8",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "table": {
+          "__rl": true,
+          "value": "income_total",
+          "mode": "list",
+          "cachedResultName": "income_total"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        480,
+        416
+      ],
+      "id": "b8b870b0-a130-4eef-8518-4e50b703d069",
+      "name": "Get Remaining Budget",
+      "credentials": {
+        "mySql": {
+          "id": "OA8TlRmZI5vEXPv8",
+          "name": "MySQL account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get 3 Latest Total Spending",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MongoDB Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get 3 Latest Total Spending": {
+      "main": [
+        [
+          {
+            "node": "Format Total to Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Total to Prompt": {
+      "main": [
+        [
+          {
+            "node": "Get Today Spending",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Today to Prompt": {
+      "main": [
+        [
+          {
+            "node": "Get Remaining Budget",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Today Spending": {
+      "main": [
+        [
+          {
+            "node": "Format Today to Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Remaining Budget": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Jakarta",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 300,
+    "availableInMCP": false,
+    "errorWorkflow": "s98o7VjcALziLv2D",
+    "timeSavedPerExecution": 5
+  },
+  "versionId": "8924c740-1771-4059-a566-46084b2f9a61",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "84874fc0213a445260548cee43d8f59791f08dc93c424a3e85fed02513cd55e4"
+  },
+  "id": "s98o7VjcALziLv2D",
+  "tags": []
+}
