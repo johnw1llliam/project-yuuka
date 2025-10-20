@@ -14,7 +14,7 @@ Workflow Automation: n8n
 - Chat Memory: MongoDB
 - Web Search: Tavily AI
 
-## Workflows:
+## Workflows
 **1. Yuuka (Chat)**<br>
 This is the main conversational interface, triggered via a webhook. It uses an AI-powered router to understand the user's intent and direct the query to one of three specialized agents.
 It features:<br>
@@ -35,3 +35,9 @@ The workflow has following features:<br>
 - Format Data: Custom Code nodes format this data into a clean, human-readable list for the AI.
 - AI Analysis: All the financial data is passed to the "Yuuka" agent, who is prompted to "analyze ~~her boyfriend's~~ daily expenses" and provide a (likely annoyed) summary.
 - This workflow shares the same MongoDB Chat Memory, so the daily analysis becomes part of the ongoing conversation history.
+
+## Usage
+You can use this project to create a website or app. There is a MySQL database there that I use in Streamlit for my money management website. Feel free to modify the SQL and Workflow. 
+
+## Post Scriptum
+Please tag me if you created something from this workflow, I am eiger to see your creation :D
