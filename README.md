@@ -14,6 +14,11 @@ Workflow Automation: n8n
 - Chat Memory: MongoDB
 - Web Search: Tavily AI
 
+## Installation
+1. Install n8n
+2. Paste the JSON content
+You may refer to this <a href="https://www.youtube.com/watch?v=vpFupARhmDs">video</a>
+
 ## Workflows
 **1. Yuuka (Chat)**<br>
 This is the main conversational interface, triggered via a webhook. It uses an AI-powered router to understand the user's intent and direct the query to one of three specialized agents.
