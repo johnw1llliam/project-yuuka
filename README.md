@@ -16,7 +16,7 @@ Workflow Automation: n8n
 
 ## Installation
 1. Install n8n
-2. Paste the JSON content
+2. Paste the JSON content<br>
 You may refer to this <a href="https://www.youtube.com/watch?v=vpFupARhmDs">video</a>
 
 ## Workflows
