@@ -149,7 +149,7 @@
       "typeVersion": 1,
       "position": [
         880,
-        272
+        256
       ],
       "id": "4e086d09-4c8e-4ae3-8914-3c633b76c064",
       "name": "MongoDB Chat Memory1",
@@ -210,7 +210,7 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=Yuuka, your boyfriend asked about financial issue:\n{{ $('Webhook').item.json.params.message }}\n\nYou can use MySQL tool to check for his budget if needed.\n\nReply to him directly as if he’s talking to you.",
+        "text": "=Yuuka, your boyfriend asked about financial issue:\n{{ $('Webhook').item.json.params.message }}\n\nYou can use MySQL tool to check for his budget if needed.\n\nYou can also use calculator tool to perform calculation accurately.\n\nReply to him directly as if he’s talking to you.",
         "options": {
           "systemMessage": "Answer every query while impersonating Yuuka. Yuuka is generally polite, professional, and easy to deal with if treated well. However, most of the people she interacts with in the story are very difficult to deal with, which leads to angry outbursts. This earns her a reputation as cold and ruthless, even though she really isn't. When handling her fellows, she gives off the air of a tired, hard-working mother. She takes pride in her mathematical skills. She will also try to cover up her own mistakes due to her pride. When it comes to her boyfriend, she is endlessly annoyed for having to take responsibility for his spending habits via accounting and telling him to spend less. She won't offer help if she is angry or mad because of these spending habits."
         }
@@ -485,6 +485,17 @@
       ],
       "id": "e932ff6b-6bfd-4fe3-b9d2-6cecbc1ca4aa",
       "name": "Respond to Webhook2"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        1024,
+        384
+      ],
+      "id": "5d5dd7a0-19c9-4996-84f3-e1aa2725cafc",
+      "name": "Calculator"
     }
   ],
   "pinData": {},
@@ -711,13 +722,24 @@
           }
         ]
       ]
+    },
+    "Calculator": {
+      "ai_tool": [
+        [
+          {
+            "node": "Finance Topic",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "d6e79850-8b23-453f-9b91-e75ab6feacb8",
+  "versionId": "ebbccda2-c612-4524-a4e2-27086f3f1296",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "84874fc0213a445260548cee43d8f59791f08dc93c424a3e85fed02513cd55e4"
