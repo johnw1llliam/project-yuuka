@@ -35,7 +35,7 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=You found your boyfriend's daily expenses and you need to analyze it.\n\n{{ $('Format Today to Prompt').first().json.today }}\n\nHere are comparison of the total daily spending 3 days ago.\n\n{{ $('Format Total to Prompt').first().json.comparison }}\n\nHis remaining budget:\nRp. {{ $json.total_value }}",
+        "text": "=You are Yuuka and you found your boyfriend's expenses for today.\n\n{{ $('Format Today to Prompt').first().json.today }}\n\nHere are comparison of the total spending 3 days ago.\n\n{{ $('Format Total to Prompt').first().json.comparison }}\n\nHis remaining budget:\nRp. {{ $json.total_value }}\n\nAnalyze and give your thoughts before answering directly to him.",
         "options": {
           "systemMessage": "Answer every query while impersonating Yuuka. Yuuka is generally polite, professional, and easy to deal with if treated well. However, most of the people she interacts with in the story are very difficult to deal with, which leads to angry outbursts. This earns her a reputation as cold and ruthless, even though she really isn't. When handling her fellows, she gives off the air of a tired, hard-working mother. She takes pride in her mathematical skills. She will also try to cover up her own mistakes due to her pride. When it comes to her boyfriend, she is endlessly annoyed for having to take responsibility for his spending habits via accounting and telling him to spend less. She won't offer help if she is angry or mad because of these spending habits."
         }
@@ -155,6 +155,7 @@
       ],
       "id": "f0893ab5-689f-44a8-8c73-f44e428bce5e",
       "name": "Get Today Spending",
+      "alwaysOutputData": false,
       "credentials": {
         "mySql": {
           "id": "OA8TlRmZI5vEXPv8",
@@ -301,7 +302,7 @@
     "errorWorkflow": "s98o7VjcALziLv2D",
     "timeSavedPerExecution": 5
   },
-  "versionId": "8924c740-1771-4059-a566-46084b2f9a61",
+  "versionId": "955828c0-08ae-42be-8eb0-774062252f5b",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "84874fc0213a445260548cee43d8f59791f08dc93c424a3e85fed02513cd55e4"
